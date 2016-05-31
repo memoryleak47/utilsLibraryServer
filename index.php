@@ -9,7 +9,8 @@
 
 	function authenticate($username, $password)
 	{
-		return True;
+		$user=mysql_fetch_array(mysql_query("SELECT * FROM ulUsers WHERE username='".$username."' AND password='".$password."'"));
+		return isset($user['username']);
 	}
 
 	$conn = mysql_connect($dbhost, $dbuser, $dbpass);
