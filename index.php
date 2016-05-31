@@ -79,13 +79,6 @@
 
 		move_uploaded_file($_FILES['zippy']['tmp_name'], "confs/".$_GET['confname']);
 	}
-	else if ($_GET['cmd'] == "getConf")
-	{
-		if (! isset($_GET['confname'])) error('confname is undefined');
-		if (! exists('ulConfs', 'confname', $_GET['confname'])) error('conf \''.$_GET['confname'].'\' not found');
-
-		echo file_get_contents("confs/".$_GET['confname']);
-	}
 	else
 	{
 		error('unknown cmd='.$_GET['cmd']);
