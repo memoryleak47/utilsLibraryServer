@@ -24,6 +24,30 @@
 		return isset($thing[$column]);
 	}
 
+	function deleteDirectory($dir)
+		{
+			if (!file_exists($dir))
+			{
+				return true;
+			}
+			if (!is_dir($dir))
+			{
+				return unlink($dir);
+			}
+				foreach (scandir($dir) as $item)
+			{
+				if ($item == '.' || $item == '..')
+				{
+					continue;
+				}
+				if (!deleteDirectory($dir . DIRECTORY_SEPARATOR . $item))
+				{
+					return false;
+				}
+			}
+			return rmdir($dir);
+		}
+
 	$conn = mysql_connect($dbhost, $dbuser, $dbpass);
 	mysql_select_db($db);
 
@@ -84,7 +108,7 @@
 		if (! authenticate($_GET['username'], $_GET['password'])) error('wrong username and password combination');
 		if (! exists('ulConfs', 'confname', $_GET['confname'])) error('conf \''.$_GET['confname'].'\' not found');
 
-		rmdir('confs/'.$_GET['confname']);
+		deleteDirectory('confs/'.$_GET['confname']);
 		mysql_query("DELETE FROM ulConfs WHERE confname='".$_GET['confname']."' AND owner='".$_GET['username']."'");
 	}
 	else if ($_GET['cmd'] == "setConf")
@@ -99,6 +123,8 @@
 		$res = $zip->open($_FILES['zippyupload']['tmp_name']);
 		if ($res === TRUE)
 		{
+			deleteDirectory('confs/'.$_GET['confname']);
+			mkdir('confs/'.$_GET['confname']);
 			$zip->extractTo('confs/'.$_GET['confname']);
 			$zip->close();
 		}
