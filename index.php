@@ -121,7 +121,13 @@
 		$zipfilename = "zippy.zip";
 		$zip = new ZipArchive;
 		$zip->open($zipfilename, ZipArchive::CREATE);
-		$zip->addFile('confs/'.$_GET['confname']);
+
+		$iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator("confs/".$_GET['confname']));
+		foreach ($iterator as $key => $value)
+		{
+			$zip->addFile(realpath($key), $key) or error("zip: Could not add file: $key");
+		}
+
 		$zip->close();
 		echo file_get_contents($zipfilename);
 	}
