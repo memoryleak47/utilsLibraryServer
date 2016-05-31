@@ -19,7 +19,7 @@
 			echo "$file ";
 		}
 	}
-	else if ($_GET['cmd'] == "addUser" && isset($_GET['username'] && isset($_GET['password'])))
+	else if ($_GET['cmd'] == "addUser" && isset($_GET['username']) && isset($_GET['password']))
 	{
 		mysql_query("INSERT INTO ulUsers (username, password) VALUES($_GET['username'], $_GET['password']");
 	}
