@@ -87,6 +87,26 @@
 		rmdir('confs/'.$_GET['confname']);
 		mysql_query("DELETE FROM ulConfs WHERE confname='".$_GET['confname']."' AND owner='".$_GET['username']."'");
 	}
+	else if ($_GET['cmd'] == "setConf")
+	{
+		if (! isset($_GET['confname'])) error('confname is undefined');
+		if (! isset($_GET['username'])) error('username is undefined');
+		if (! isset($_GET['password'])) error('password is undefined');
+		if (! authenticate($_GET['username'], $_GET['password'])) error('wrong username and password combination');
+		if (! exists('ulConfs', 'confname', $_GET['confname'])) error('conf \''.$_GET['confname'].'\' not found');
+
+		$zip = new ZipArchive;
+		$res = $zip->open($_FILES['zippyupload']['tmp_name']);
+		if ($res === TRUE)
+		{
+			$zip->extractTo('confs/'.$_GET['confname']);
+			$zip->close();
+		}
+		else
+		{
+			echo 'Failed to upload file';
+		}
+	}
 	else
 	{
 		error('unknown cmd='.$_GET['cmd']);
