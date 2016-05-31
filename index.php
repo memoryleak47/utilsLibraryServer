@@ -18,6 +18,12 @@
 		return isset($user['username']);
 	}
 
+	function exists($table, $column, $value)
+	{
+		$thing=mysql_fetch_array(mysql_query("SELECT * FROM ".$table." WHERE ".$column."='".$value."'"));
+		return isset($thing[$column]);
+	}
+
 	$conn = mysql_connect($dbhost, $dbuser, $dbpass);
 	mysql_select_db($db);
 
@@ -25,9 +31,10 @@
 
 	if ($_GET['cmd'] == "getFiles")
 	{
-		if (! isset($_GET['conf'])) error('conf is undefined.');
+		if (! isset($_GET['confname'])) error('confname is undefined.');
+		if (! exists('ulConfs', 'confname', $_GET['confname'])) error('conf \''.$_GET['confname'].'\' not found');
 
-		foreach (glob("confs/".$_GET['conf']."/*") as $file)
+		foreach (glob("confs/".$_GET['confname']."/*") as $file)
 		{
 			echo "$file ";
 		}
@@ -36,6 +43,7 @@
 	{
 		if (! isset($_GET['username'])) error('username is undefined');
 		if (! isset($_GET['password'])) error('password is undefined');
+		if (exists('ulUsers', 'username', $_GET['username'])) error('user \''.$_GET['username'].'\' already exists');
 
 		mysql_query("INSERT INTO ulUsers (username, password) VALUES('".$_GET['username']."', '".$_GET['password']."')");
 	}
@@ -44,6 +52,7 @@
 		if (! isset($_GET['username'])) error('username is undefined');
 		if (! isset($_GET['password'])) error('password is undefined');
 		if (! authenticate($_GET['username'], $_GET['password'])) error('wrong username and password combination');
+		if (! exists('ulUsers', 'username', $_GET['username'])) error('user \''.$_GET['username'].'\' not found');
 
 		mysql_query("DELETE FROM ulUsers WHERE username='".$_GET['username']."' AND password='".$_GET['password']."'");
 	}
@@ -53,6 +62,7 @@
 		if (! isset($_GET['username'])) error('username is undefined');
 		if (! isset($_GET['password'])) error('password is undefined');
 		if (! authenticate($_GET['username'], $_GET['password'])) error('wrong username and password combination');
+		if (exists('ulConfs', 'confname', $_GET['confname'])) error('conf \''.$_GET['confname'].'\' already exists');
 
 		mysql_query("INSERT INTO ulConfs (confname, owner, collaborators) VALUES('".$_GET['confname']."', '".$_GET['username']."', '')");
 	}
@@ -62,6 +72,7 @@
 		if (! isset($_GET['username'])) error('username is undefined');
 		if (! isset($_GET['password'])) error('password is undefined');
 		if (! authenticate($_GET['username'], $_GET['password'])) error('wrong username and password combination');
+		if (! exists('ulConfs', 'confname', $_GET['confname'])) error('conf \''.$_GET['confname'].'\' not found');
 
 		mysql_query("DELETE FROM ulConfs WHERE confname='".$_GET['confname']."' AND owner='".$_GET['username']."'");
 	}
