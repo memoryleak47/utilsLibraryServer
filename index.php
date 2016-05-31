@@ -23,4 +23,8 @@
 	{
 		mysql_query("INSERT INTO ulUsers (username, password) VALUES('".$_GET['username']."', '".$_GET['password']."')");
 	}
+	else if ($_GET['cmd'] == "deleteUser" && isset($_GET['username']) && isset($_GET['password']))
+	{
+		mysql_query("DELETE FROM ulUsers WHERE username='".$_GET['username']."' AND password='".$_GET['password']."'");
+	}
 ?>
