@@ -24,30 +24,6 @@
 		return isset($thing[$column]);
 	}
 
-	function deleteDirectory($dir)
-		{
-			if (!file_exists($dir))
-			{
-				return true;
-			}
-			if (!is_dir($dir))
-			{
-				return unlink($dir);
-			}
-				foreach (scandir($dir) as $item)
-			{
-				if ($item == '.' || $item == '..')
-				{
-					continue;
-				}
-				if (!deleteDirectory($dir . DIRECTORY_SEPARATOR . $item))
-				{
-					return false;
-				}
-			}
-			return rmdir($dir);
-		}
-
 	$conn = mysql_connect($dbhost, $dbuser, $dbpass);
 	mysql_select_db($db);
 
@@ -78,7 +54,7 @@
 		if (! authenticate($_GET['username'], $_GET['password'])) error('wrong username and password combination');
 		if (exists('ulConfs', 'confname', $_GET['confname'])) error('conf \''.$_GET['confname'].'\' already exists');
 
-		mkdir('confs/'.$_GET['confname']);
+		touch('confs/'.$_GET['confname']);
 		mysql_query("INSERT INTO ulConfs (confname, owner, collaborators) VALUES('".$_GET['confname']."', '".$_GET['username']."', '')");
 	}
 	else if ($_GET['cmd'] == "deleteConf")
@@ -89,7 +65,7 @@
 		if (! authenticate($_GET['username'], $_GET['password'])) error('wrong username and password combination');
 		if (! exists('ulConfs', 'confname', $_GET['confname'])) error('conf \''.$_GET['confname'].'\' not found');
 
-		deleteDirectory('confs/'.$_GET['confname']);
+		unlink('confs/'.$_GET['confname']);
 		mysql_query("DELETE FROM ulConfs WHERE confname='".$_GET['confname']."' AND owner='".$_GET['username']."'");
 	}
 	else if ($_GET['cmd'] == "setConf")
@@ -100,36 +76,14 @@
 		if (! authenticate($_GET['username'], $_GET['password'])) error('wrong username and password combination');
 		if (! exists('ulConfs', 'confname', $_GET['confname'])) error('conf \''.$_GET['confname'].'\' not found');
 
-		$zip = new ZipArchive;
-		$res = $zip->open($_FILES['zippyupload']['tmp_name']);
-		if ($res === TRUE)
-		{
-			deleteDirectory('confs/'.$_GET['confname']);
-			mkdir('confs/'.$_GET['confname']);
-			$zip->extractTo('confs/'.$_GET['confname']);
-			$zip->close();
-		}
-		else
-		{
-			echo 'Failed to upload file';
-		}
+		move_uploaded_file($_FILES['zippy']['tmp_name'], "confs/".$_GET['confname']);
 	}
 	else if ($_GET['cmd'] == "getConf")
 	{
 		if (! isset($_GET['confname'])) error('confname is undefined');
 		if (! exists('ulConfs', 'confname', $_GET['confname'])) error('conf \''.$_GET['confname'].'\' not found');
-		$zipfilename = "zippy.zip";
-		$zip = new ZipArchive;
-		$zip->open($zipfilename, ZipArchive::CREATE);
 
-		$iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator("confs/".$_GET['confname']));
-		foreach ($iterator as $key => $value)
-		{
-			$zip->addFile(realpath($key), $key) or error("zip: Could not add file: $key");
-		}
-
-		$zip->close();
-		echo file_get_contents($zipfilename);
+		echo file_get_contents("confs/".$_GET['confname']);
 	}
 	else
 	{
