@@ -4,7 +4,7 @@
 	{
 		foreach (glob("confs/".$_GET['conf']."/*") as $file)
 		{
-			echo "$file \r\n";
+			echo "$file ";
 		}
 	}
 ?>
