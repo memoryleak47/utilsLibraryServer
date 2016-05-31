@@ -116,7 +116,14 @@
 	}
 	else if ($_GET['cmd'] == "getConf")
 	{
-		error 'TODO'
+		if (! isset($_GET['confname'])) error('confname is undefined');
+		if (! exists('ulConfs', 'confname', $_GET['confname'])) error('conf \''.$_GET['confname'].'\' not found');
+		$zipfilename = "zippy.zip";
+		$zip = new ZipArchive;
+		$zip->open($zipfilename, ZipArchive::CREATE);
+		$zip->addFile('confs/'.$_GET['confname']);
+		$zip->close();
+		echo file_get_contents($zipfilename);
 	}
 	else
 	{
