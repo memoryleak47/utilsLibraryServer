@@ -54,6 +54,7 @@
 		if (! authenticate($_GET['username'], $_GET['password'])) error('wrong username and password combination');
 		if (exists('ulConfs', 'confname', $_GET['confname'])) error('conf \''.$_GET['confname'].'\' already exists');
 
+		if (! file_exists("confs")) mkdir("confs");
 		touch('confs/'.$_GET['confname']);
 		mysql_query("INSERT INTO ulConfs (confname, owner, collaborators) VALUES('".$_GET['confname']."', '".$_GET['username']."', '')");
 	}
