@@ -53,26 +53,7 @@
 
 	if (! isset($_GET['cmd'])) error('cmd is undefined');
 
-	if ($_GET['cmd'] == "getFiles")
-	{
-		if (! isset($_GET['confname'])) error('confname is undefined.');
-		if (! exists('ulConfs', 'confname', $_GET['confname'])) error('conf \''.$_GET['confname'].'\' not found');
-
-		function rglob($pattern, $flags = 0)
-		{
-			$files = glob($pattern, $flags);
-			foreach (glob(dirname($pattern).'/*', GLOB_ONLYDIR|GLOB_NOSORT) as $dir)
-			{
-				$files = array_merge($files, rglob($dir.'/*', $flags));
-			}
-			return $files;
-		}
-		foreach (rglob("confs/".$_GET['confname']."/*") as $file)
-		{
-			echo "$file ";
-		}
-	}
-	else if ($_GET['cmd'] == "addUser")
+	if ($_GET['cmd'] == "createUser")
 	{
 		if (! isset($_GET['username'])) error('username is undefined');
 		if (! isset($_GET['password'])) error('password is undefined');
@@ -89,7 +70,7 @@
 
 		mysql_query("DELETE FROM ulUsers WHERE username='".$_GET['username']."' AND password='".$_GET['password']."'");
 	}
-	else if ($_GET['cmd'] == "addConf")
+	else if ($_GET['cmd'] == "createConf")
 	{
 		if (! isset($_GET['confname'])) error('confname is undefined');
 		if (! isset($_GET['username'])) error('username is undefined');
@@ -132,6 +113,10 @@
 		{
 			echo 'Failed to upload file';
 		}
+	}
+	else if ($_GET['cmd'] == "getConf")
+	{
+		error 'TODO'
 	}
 	else
 	{
