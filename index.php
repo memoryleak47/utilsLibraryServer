@@ -34,7 +34,16 @@
 		if (! isset($_GET['confname'])) error('confname is undefined.');
 		if (! exists('ulConfs', 'confname', $_GET['confname'])) error('conf \''.$_GET['confname'].'\' not found');
 
-		foreach (glob("confs/".$_GET['confname']."/*") as $file)
+		function rglob($pattern, $flags = 0)
+		{
+			$files = glob($pattern, $flags);
+			foreach (glob(dirname($pattern).'/*', GLOB_ONLYDIR|GLOB_NOSORT) as $dir)
+			{
+				$files = array_merge($files, rglob($dir.'/*', $flags));
+			}
+			return $files;
+		}
+		foreach (rglob("confs/".$_GET['confname']."/*") as $file)
 		{
 			echo "$file ";
 		}
