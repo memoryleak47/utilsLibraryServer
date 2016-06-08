@@ -44,7 +44,8 @@
 		if (! authenticate($_GET['username'], $_GET['password'])) error('wrong username and password combination');
 		if (! exists('ulUsers', 'username', $_GET['username'])) error('user \''.$_GET['username'].'\' not found');
 
-		mysql_query("DELETE FROM ulUsers WHERE username='".$_GET['username']."' AND password='".$_GET['password']."'");
+		mysql_query("DELETE FROM ulUsers WHERE username='".$_GET['username']."'");
+		mysql_query("DELETE FROM ulConfs WHERE owner='".$_GET['username']."'");
 	}
 	else if ($_GET['cmd'] == "createConf")
 	{
