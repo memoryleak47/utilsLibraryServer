@@ -45,6 +45,11 @@
 		if (! exists('ulUsers', 'username', $_GET['username'])) error('user \''.$_GET['username'].'\' not found');
 
 		mysql_query("DELETE FROM ulUsers WHERE username='".$_GET['username']."'");
+		$q = mysql_query("SELECT * FROM ulConfs WHERE owner='".$_GET['username']."'");
+		while ($conf = mysql_fetch_assoc($q))
+		{
+			unlink('confs/'.$conf["confname"].'.zip');
+		}
 		mysql_query("DELETE FROM ulConfs WHERE owner='".$_GET['username']."'");
 	}
 	else if ($_GET['cmd'] == "createConf")
@@ -67,7 +72,7 @@
 		if (! authenticate($_GET['username'], $_GET['password'])) error('wrong username and password combination');
 		if (! exists('ulConfs', 'confname', $_GET['confname'])) error('conf \''.$_GET['confname'].'\' not found');
 
-		unlink('confs/'.$_GET['confname']);
+		unlink('confs/'.$_GET['confname'].'.zip');
 		mysql_query("DELETE FROM ulConfs WHERE confname='".$_GET['confname']."' AND owner='".$_GET['username']."'");
 	}
 	else if ($_GET['cmd'] == "setConf")
